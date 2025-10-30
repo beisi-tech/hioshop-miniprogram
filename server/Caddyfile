@@ -1,0 +1,24 @@
+:80 {
+    encode gzip zstd
+
+    handle /static/* {
+        reverse_proxy server:8360
+    }
+
+    handle_path /api/* {
+        reverse_proxy server:8360
+    }
+
+    handle_path /admin/* {
+        reverse_proxy server:8360
+    }
+
+    handle {
+        reverse_proxy server:8360
+    }
+
+    log {
+        output stdout
+        format console
+    }
+}
