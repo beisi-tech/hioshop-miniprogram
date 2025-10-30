@@ -1,0 +1,27 @@
+﻿# Node modules
+node_modules/
+**/node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 各项目特定
+miniprogram/node_modules/
+admin/dist/
+admin/node_modules/
+server/node_modules/
+server/runtime/
+server/logs/
+server/app/runtime/
