@@ -4,37 +4,37 @@
 
 ## 📁 项目结构
 
-\\\
+```
 hioshop/
 ├── miniprogram/    # 微信小程序端
 ├── admin/          # 后台管理系统（子模块）
 └── server/         # 后端 API 服务（子模块）
-\\\
+```
 
 ## 🚀 克隆项目
 
 ### 克隆主仓库及所有子模块
-\\\ash
+```bash
 git clone --recursive https://github.com/beisi-tech/hioshop-miniprogram.git
-\\\
+```
 
 ### 或者分步克隆
-\\\ash
+```bash
 git clone https://github.com/beisi-tech/hioshop-miniprogram.git
 cd hioshop-miniprogram
 git submodule update --init --recursive
-\\\
+```
 
 ## 🔄 更新子模块
 
-\\\ash
+```bash
 # 更新所有子模块到最新版本
 git submodule update --remote
 
 # 更新特定子模块
 cd admin
 git pull origin master
-\\\
+```
 
 ## 📖 原始仓库
 

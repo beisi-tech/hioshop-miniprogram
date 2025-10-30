@@ -2,7 +2,7 @@
 
 + 基于开源项目NideShop重建，精简了一些功能的同时完善了一些功能，并重新设计了UI
 + 测试数据来自上述开源项目
-+ 服务端api基于Ｎode.js+ThinkJS+MySQL
++ 服务端api基于Node.js+ThinkJS+MySQL
 
 ### 基于海风小店开发上线的小程序
 <img width="200" src="https://raw.githubusercontent.com/iamdarcy/hiolabs/master/git-images/mwyx.jpg">
