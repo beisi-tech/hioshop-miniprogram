@@ -1,0 +1,6 @@
+[submodule "admin"]
+	path = admin
+	url = https://github.com/beisi-tech/hioshop-admin.git
+[submodule "server"]
+	path = server
+	url = https://github.com/beisi-tech/hioshop-server.git

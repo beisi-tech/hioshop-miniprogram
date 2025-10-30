@@ -28,7 +28,7 @@ module.exports = {
   SaveUserId: ApiRootUrl + 'goods/saveUserId',
   // 收货地址
   AddressDetail: ApiRootUrl + 'address/addressDetail', //收货地址详情
-  DeleteAddress: ApiRootUrl + 'address/deleteAddress', //保存收货地址
+  DeleteAddress: ApiRootUrl + 'address/deleteAddress', //删除收货地址
   SaveAddress: ApiRootUrl + 'address/saveAddress', //保存收货地址
   GetAddresses: ApiRootUrl + 'address/getAddresses',
   RegionList: ApiRootUrl + 'region/list', //获取区域列表
@@ -49,7 +49,7 @@ module.exports = {
   // 搜索
   SearchIndex: ApiRootUrl + 'search/index', //搜索页面数据
   SearchHelper: ApiRootUrl + 'search/helper', //搜索帮助
-  SearchClearHistory: ApiRootUrl + 'search/clearHistory', //搜索帮助
+  SearchClearHistory: ApiRootUrl + 'search/clearHistory', //清除搜索历史
   ShowSettings: ApiRootUrl + 'settings/showSettings',
   SaveSettings: ApiRootUrl + 'settings/save',
   SettingsDetail: ApiRootUrl + 'settings/userDetail',
