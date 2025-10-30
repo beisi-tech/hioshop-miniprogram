@@ -1,0 +1,32 @@
+services:
+  server:
+    image: beisitech/hioshop-server:latest
+    container_name: hioshop-server
+    environment:
+      NODE_ENV: production
+      PORT: 8360
+    expose:
+      - "8360"
+    volumes:
+      - ./runtime:/srv/hioshop/runtime
+    restart: unless-stopped
+    networks:
+      - beisi-shared-network
+
+  hioshop:
+    image: caddy:latest
+    container_name: hioshop
+    depends_on:
+      - server
+    ports:
+      - "80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    restart: unless-stopped
+    networks:
+      - beisi-shared-network
+
+networks:
+  beisi-shared-network:
+    external: true
+    name: beisi-shared-network

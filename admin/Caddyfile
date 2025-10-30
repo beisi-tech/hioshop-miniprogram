@@ -1,0 +1,8 @@
+:80 {
+	handle /admin/* {
+		uri strip_prefix /admin
+		root * /usr/share/caddy/admin
+		try_files {path} /index.html
+		file_server
+	}
+}
