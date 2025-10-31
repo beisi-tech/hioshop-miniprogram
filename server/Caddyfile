@@ -12,9 +12,9 @@
     handle_path /admin/* {
         reverse_proxy server:8360
     }
-
+ # 默认路径转发到管理后台前端
     handle {
-        reverse_proxy server:8360
+       reverse_proxy hioshop-admin:80
     }
 
     log {
