@@ -1,10 +1,6 @@
 :80 {
     encode gzip zstd
 
-    handle /static/* {
-        reverse_proxy server:8360
-    }
-
     handle_path /api/* {
         reverse_proxy server:8360
     }
@@ -12,7 +8,8 @@
     handle_path /admin/* {
         reverse_proxy server:8360
     }
- # 默认路径转发到管理后台前端
+
+ # 默认路径转发到管理后台前端（包括/static/*静态资源）
     handle {
        reverse_proxy hioshop-admin:80
     }

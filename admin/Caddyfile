@@ -1,8 +1,10 @@
 :80 {
-	handle /admin/* {
-		uri strip_prefix /admin
+		# 托管管理后台静态文件
 		root * /usr/share/caddy/admin
 		try_files {path} /index.html
 		file_server
-	}
+	log {
+        output stdout
+        format console
+    }
 }
