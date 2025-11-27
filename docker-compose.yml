@@ -1,5 +1,5 @@
 services:
-  server:
+  hioshop-server:
     image: beisitech/hioshop-server:latest
     container_name: hioshop-server
     environment:
@@ -11,22 +11,20 @@ services:
       - ./runtime:/srv/hioshop/runtime
     restart: unless-stopped
     networks:
-      - beisi-shared-network
+      - beisi-network
 
-  hioshop:
-    image: caddy:latest
-    container_name: hioshop
-    depends_on:
-      - server
-    ports:
-      - "80"
+  hioshop-admin:
+    image: beisitech/hioshop-admin:latest
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-    restart: unless-stopped
+      - "/caddy/data:/data"
+    container_name: hioshop-admin
+    restart: on-failure:3
+    env_file:
+      - .env
     networks:
-      - beisi-shared-network
+      - beisi-network
 
 networks:
-  beisi-shared-network:
+  beisi-network:
     external: true
     name: beisi-shared-network

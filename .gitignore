@@ -17,6 +17,12 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
+# 环境变量文件
+.env
+**/.env
+!.env.example
+!**/.env.example
+
 # 各项目特定
 miniprogram/node_modules/
 admin/dist/
