@@ -36,6 +36,15 @@ module.exports = {
       warnings: false,
       errors: true,
     },
+    proxy: {
+      '/api/admin': {
+        target: 'http://localhost:8525',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api/admin': '/api/admin'
+        }
+      }
+    }
     // lintOnSave: false,
     // before: require("./mock/mock-server.js"),
   },
