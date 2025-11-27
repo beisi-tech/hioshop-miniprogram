@@ -15,8 +15,6 @@ services:
 
   hioshop-admin:
     image: beisitech/hioshop-admin:latest
-    volumes:
-      - "/caddy/data:/data"
     container_name: hioshop-admin
     restart: on-failure:3
     env_file:
