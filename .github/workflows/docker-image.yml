@@ -1,0 +1,133 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      admin: ${{ steps.set-outputs.outputs.admin }}
+      server: ${{ steps.set-outputs.outputs.server }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            admin:
+              - "admin/**"
+            server:
+              - "server/**"
+
+      - id: set-outputs
+        run: |
+          echo "admin=${{ steps.filter.outputs.admin }}" >> "$GITHUB_OUTPUT"
+          echo "server=${{ steps.filter.outputs.server }}" >> "$GITHUB_OUTPUT"
+
+  prepare:
+    name: Prepare Image Tag
+    needs: changes
+    if: ${{ needs.changes.outputs.admin == 'true' || needs.changes.outputs.server == 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.set_tag.outputs.tag }}
+    steps:
+      - name: Set image tag
+        id: set_tag
+        run: |
+          TAG="$(date +%Y%m%d)-${GITHUB_RUN_NUMBER}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+  admin-image:
+    name: Admin Image
+    needs: [changes, prepare]
+    if: ${{ needs.changes.outputs.admin == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: admin
+    env:
+      TZ: Asia/Shanghai
+      DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+      IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+      TAG: ${{ needs.prepare.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        if: ${{ github.event_name == 'push' }}
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USER }}" --password-stdin
+
+      - name: Build Docker image
+        run: |
+          docker build . \
+            -t ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+
+      - name: Tag and Push (date tag + latest)
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          docker tag ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }} \
+                     ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:latest
+
+          docker push ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          docker push ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Show pushed image info
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          echo "✅ Image pushed:"
+          echo " - ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}"
+          echo " - ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:latest"
+
+  server-image:
+    name: Server Image
+    needs: [changes, prepare]
+    if: ${{ needs.changes.outputs.server == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    env:
+      TZ: Asia/Shanghai
+      DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+      IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+      TAG: ${{ needs.prepare.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        if: ${{ github.event_name == 'push' }}
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USER }}" --password-stdin
+
+      - name: Build Docker image
+        run: |
+          docker build . \
+            -t ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+
+      - name: Tag and Push (date tag + latest)
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          docker tag ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }} \
+                     ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:latest
+
+          docker push ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          docker push ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Show pushed image info
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          echo "✅ Image pushed:"
+          echo " - ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}"
+          echo " - ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:latest"
