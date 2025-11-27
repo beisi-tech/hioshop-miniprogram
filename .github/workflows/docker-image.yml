@@ -61,7 +61,7 @@ jobs:
     env:
       TZ: Asia/Shanghai
       DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
-      IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+      IMAGE_NAME: ${{ secrets.ADMIN_IMAGE_NAME }}
       TAG: ${{ needs.prepare.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
@@ -102,7 +102,7 @@ jobs:
     env:
       TZ: Asia/Shanghai
       DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
-      IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+      IMAGE_NAME: ${{ secrets.SERVER_IMAGE_NAME }}
       TAG: ${{ needs.prepare.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
