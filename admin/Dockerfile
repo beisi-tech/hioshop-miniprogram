@@ -8,7 +8,7 @@ ENV TZ=Asia/Shanghai
 COPY package.json pnpm-lock.yaml ./
 
 # 安装 pnpm 并安装依赖
-RUN corepack enable && pnpm install --frozen-lockfile
+RUN npm install -g pnpm && pnpm install --frozen-lockfile
 
 # 复制项目文件
 COPY . .
