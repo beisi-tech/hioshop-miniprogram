@@ -38,10 +38,10 @@ module.exports = {
     },
     proxy: {
       '/api/admin': {
-        target: 'http://localhost:8525',
+        target: 'http://localhost:8360',
         changeOrigin: true,
         pathRewrite: {
-          '^/api/admin': '/api/admin'
+          '^/api/admin': '/admin'
         }
       }
     }
