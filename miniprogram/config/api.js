@@ -56,4 +56,18 @@ module.exports = {
   UploadAvatar: ApiRootUrl + 'upload/uploadAvatar',
   GetBase64: ApiRootUrl + 'qrcode/getBase64', //获取商品详情二维码
 
+  /**
+   * 获取图片完整URL
+   * 如果是完整URL（以http开头）则直接返回
+   * 如果是相对路径则拼接ApiRoot
+   * @param {string} url 图片URL或相对路径
+   * @returns {string} 完整的图片URL
+   */
+  getImageUrl: function(url) {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    return ApiRoot + url;
+  }
 };

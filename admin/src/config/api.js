@@ -1,24 +1,24 @@
 const api = {
-    rootUrl : '',  // 留空，因为在 main.js 中已设置 Axios.defaults.baseURL = '/api/admin/'
-    // express: {
-    //     // 快递物流信息查询使用的是快递鸟接口，申请地址：http://www.kdniao.com/
-    //     appid: '123', // 对应快递鸟用户后台 用户ID
-    //     appkey: '123123', // 对应快递鸟用户后台 API key
-    //     request_url: 'http://api.kdniao.cc/Ebusiness/EbusinessOrderHandle.aspx'
-    // },
-	// 4.19更新，物流查询不需要以上配置，只需要在server的config配置阿里云物流接口就可以
-    qiniu: 'http://up-z0.qiniu.com',
-    // 请根据自己创建的七牛的区域进行设置：
-    // https://developer.qiniu.com/kodo/manual/1671/region-endpoint
-	// 华东	  http(s)://up.qiniup.com
-	// 华北	  http(s)://up-z1.qiniup.com
-	// 华南	  http(s)://up-z2.qiniup.com
-	// 北美	  http(s)://up-na0.qiniup.com
-	// 东南亚 http(s)://up-as0.qiniup.com
+    rootUrl: '',  // 留空，因为在 main.js 中已设置 Axios.defaults.baseURL = '/api/admin/'
+    // 本地上传接口
+    uploadUrl: 'upload/image',
 };
 
-
-// import api from './config/api'
-// Axios.defaults.baseURL = api.rootUrl;
+/**
+ * 获取图片完整URL
+ * - 第三方图片(http/https开头)直接返回
+ * - 本地图片(相对路径)不需要拼接，因为同域访问
+ * @param {string} url 图片路径
+ * @returns {string} 完整的图片URL
+ */
+export function getImageUrl(url) {
+    if (!url) return '';
+    // 如果是完整URL，直接返回
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+    }
+    // 本地图片，相对路径直接使用（同域访问）
+    return url;
+}
 
 export default api

@@ -23,8 +23,8 @@
 						</div>
 					</el-form-item>
 					<el-form-item label="广告图片" prop="image_url" v-if="!infoForm.image_url">
-						<el-upload name="file" ref="upload" class="upload-demo" :action="qiniuZone" :on-success="handleSuccess"
-						 :before-upload="getQiniuToken" :auto-upload="true" list-type="picture-card" :data="picData" :http-request="uploadIndexImg">
+						<el-upload name="file" ref="upload" class="upload-demo" :action="uploadUrl" :on-success="handleSuccess"
+						 :headers="uploadHeaders" :auto-upload="true" list-type="picture-card" :data="{ type: 'ad' }" :http-request="uploadIndexImg">
 							<el-button size="small" type="primary">点击上传</el-button>
 							<div slot="tip" class="el-upload__tip">只能上传jpg/png文件</div>
 						</el-upload>
@@ -97,7 +97,10 @@
     export default {
         data() {
             return {
-                qiniuZone:'',
+                uploadUrl: api.rootUrl + api.uploadUrl,
+                uploadHeaders: {
+                    'X-Hiolabs-Token': localStorage.getItem('token') || ''
+                },
                 root: '',
                 fileList: [],
                 infoForm: {
@@ -117,10 +120,6 @@
                         {required: true, message: '请选择时间', trigger: 'blur'},
                     ],
                 },
-                picData: {
-                    token: ''
-                },
-                url: '',
                 chooseRelateGoods: [],
                 related_pop: false,
 				previewList: [],
@@ -150,15 +149,14 @@
 				lrz(file).then((rst) => {
 					const config = {
 						headers: {
-							'Content-Type': 'multipart/form-data'
+							'Content-Type': 'multipart/form-data',
+							'X-Hiolabs-Token': localStorage.getItem('token') || ''
 						},
 					};
-					const fileName = moment().format('YYYYMMDDHHmmssSSS') + Math.floor(Math.random() * 100) + file.name; //自定义图片名
 					const formData = new FormData();
 					formData.append('file', rst.file);
-					formData.append('token', this.picData.token);
-					formData.append('key', fileName);
-					this.$http.post(this.qiniuZone, formData, config).then((res) => {
+					formData.append('type', 'ad');
+					this.$http.post(this.uploadUrl, formData, config).then((res) => {
 						this.handleUploadImageSuccess(res.data)
 					})
 				}).catch(function(err){
@@ -166,8 +164,7 @@
 				})
 			},
 			handleUploadImageSuccess(res, file) {
-			    let url = this.url;
-			    this.infoForm.image_url = url + res.key;
+			    this.infoForm.image_url = res.fileUrl;
 			},
             relateSelect(id) {
                 console.log(id);
@@ -190,15 +187,7 @@
             adRemove(file, fileList) {
                 this.infoForm.image_url = '';
             },
-            getQiniuToken() {
-                let that = this
-                this.axios.post('index/getQiniuToken').then((response) => {
-                    let resInfo = response.data.data;
-                    console.log(resInfo);
-                    that.picData.token = resInfo.token;
-                    that.url = resInfo.url;
-                })
-            },
+
             goBackPage() {
                 this.$router.go(-1);
             },
@@ -287,8 +276,6 @@
             this.infoForm.id = this.$route.query.id || 0;
             this.getInfo();
             this.root = api.rootUrl;
-            this.getQiniuToken();
-            this.qiniuZone = api.qiniu;
         }
     }
 

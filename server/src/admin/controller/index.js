@@ -21,17 +21,8 @@ module.exports = class extends Base {
         }
         return this.success(info);
     }
-    async getQiniuTokenAction(){
-        const TokenSerivce = this.service('qiniu'); // 服务里返回token
-        let data = await TokenSerivce.getQiniuToken(); // 取得token值 goods
-        let qiniuToken = data.uploadToken;
-        let domain = data.domain;
-        let info ={
-            token:qiniuToken,
-            url:domain
-        };
-        return this.success(info);
-    }
+    // getQiniuTokenAction has been removed - using local upload instead
+    // See upload.js controller for the new upload API
     async mainAction() {
         const index = this.get('pindex');
         console.log('index:' + index);

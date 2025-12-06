@@ -30,8 +30,8 @@
 						</div>
 					</el-form-item>
 					<el-form-item label="商品图片" prop="list_pic_url" v-if="!infoForm.list_pic_url">
-						<el-upload name="file" ref="upload" class="upload-demo" :action="qiniuZone" :on-success="handleSuccess"
-						 :before-upload="indexImgBefore" :auto-upload="true" list-type="picture-card" :data="picData" :http-request="uploadIndexImg">
+						<el-upload name="file" ref="upload" class="upload-demo" :action="uploadUrl" :on-success="handleSuccess"
+						 :headers="uploadHeaders" :auto-upload="true" list-type="picture-card" :data="{ type: 'goods' }" :http-request="uploadIndexImg">
 							<el-button size="small" type="primary">点击上传</el-button>
 							<div slot="tip" class="el-upload__tip">只能上传jpg/png文件</div>
 						</el-upload>
@@ -45,8 +45,8 @@
 									<i class="el-icon-delete"></i>
 								</div>
 							</div>
-							<el-upload name="file" ref="upload" :on-remove="galleryRemove" class="upload-demo" :action="qiniuZone"
-							 :on-preview="galleryPreview" :show-file-list="false" :data="picData" :before-upload="galleryBefore" :on-error="hasErrorAct"
+							<el-upload name="file" ref="upload" :on-remove="galleryRemove" class="upload-demo" :action="uploadUrl"
+							 :on-preview="galleryPreview" :show-file-list="false" :data="{ type: 'gallery' }" :headers="uploadHeaders" :on-error="hasErrorAct"
 							 :on-success="handleSuccess" :auto-upload="true" multiple list-type="picture-card" :http-request="uploadGalleryImg">
 								<i class="el-icon-plus"></i>
 							</el-upload>
@@ -146,8 +146,8 @@
 					</el-form-item>
 					<!-- 图片上传组件辅助-->
 					<el-form-item class="upload_ad">
-						<el-upload ref="upload" name="file" class="avatar-uploader" :action="qiniuZone" list-type="picture-card"
-						 :file-list="detail_list" :before-upload="beforeUpload" :on-success="handleSuccess" :data="picData" multiple
+						<el-upload ref="upload" name="file" class="avatar-uploader" :action="uploadUrl" list-type="picture-card"
+						 :file-list="detail_list" :headers="uploadHeaders" :on-success="handleSuccess" :data="{ type: 'detail' }" multiple
 						 :http-request="uploadDetailsImg">
 						</el-upload>
 					</el-form-item>
@@ -199,11 +199,10 @@
 		data() {
 			return {
 				root: '',
-				qiniuZone: '',
-				picData: {
-					token: ''
+				uploadUrl: api.rootUrl + api.uploadUrl,
+				uploadHeaders: {
+					'X-Hiolabs-Token': localStorage.getItem('token') || ''
 				},
-				url: '',
 				kdOptions: [],
 				kdValue: '',
 				cateId: '',
@@ -294,15 +293,14 @@
 				lrz(file).then((rst) => {
 					const config = {
 						headers: {
-							'Content-Type': 'multipart/form-data'
+							'Content-Type': 'multipart/form-data',
+							'X-Hiolabs-Token': localStorage.getItem('token') || ''
 						},
 					};
-					const fileName = moment().format('YYYYMMDDHHmmssSSS') + Math.floor(Math.random() * 100) + file.name; //自定义图片名
 					const formData = new FormData();
 					formData.append('file', rst.file);
-					formData.append('token', this.picData.token);
-					formData.append('key', fileName);
-					this.$http.post(this.qiniuZone, formData, config).then((res) => {
+					formData.append('type', 'goods');
+					this.$http.post(this.uploadUrl, formData, config).then((res) => {
 						this.handleUploadListSuccess(res.data)
 					})
 				}).catch(function(err) {
@@ -310,15 +308,9 @@
 				})
 			},
 			handleUploadListSuccess(res) {
-				let url = this.url;
-				this.infoForm.list_pic_url = url + res.key;
+				this.infoForm.list_pic_url = res.fileUrl;
+				this.infoForm.https_pic_url = res.fileUrl;
 				console.log(this.infoForm.list_pic_url);
-				this.axios.post('goods/uploadHttpsImage', {
-					url: this.infoForm.list_pic_url
-				}).then((response) => {
-					let lastUrl = response.data.data;
-					this.infoForm.https_pic_url = lastUrl;
-				})
 			},
 			onRemoveHandler(index) {
 				let that = this;
@@ -338,15 +330,14 @@
 				lrz(file).then((rst) => {
 					const config = {
 						headers: {
-							'Content-Type': 'multipart/form-data'
+							'Content-Type': 'multipart/form-data',
+							'X-Hiolabs-Token': localStorage.getItem('token') || ''
 						},
 					};
-					const fileName = moment().format('YYYYMMDDHHmmssSSS') + Math.floor(Math.random() * 100) + file.name; //自定义图片名
 					const formData = new FormData();
 					formData.append('file', rst.file);
-					formData.append('token', this.picData.token);
-					formData.append('key', fileName);
-					this.$http.post(this.qiniuZone, formData, config).then((res) => {
+					formData.append('type', 'gallery');
+					this.$http.post(this.uploadUrl, formData, config).then((res) => {
 						this.handleUploadGallerySuccess(res.data)
 					})
 				}).catch(function(err) {
@@ -354,11 +345,9 @@
 				})
 			},
 			handleUploadGallerySuccess(res) {
-				let url = this.url;
-				let urlData = url + res.key;
 				let data = {
 					id: 0,
-					url: urlData,
+					url: res.fileUrl,
 					is_delete: 0,
 				}
 				this.gallery_list.push(data);
@@ -438,14 +427,7 @@
 			hasErrorAct(err) {
 				console.log(err);
 			},
-			getQiniuToken() {
-				let that = this
-				this.axios.post('index/getQiniuToken').then((response) => {
-					let resInfo = response.data.data;
-					that.picData.token = resInfo.token;
-					that.url = resInfo.url;
-				})
-			},
+
 			specChange(value) {
 				this.specForm.id = value;
 			},
@@ -488,13 +470,7 @@
 					})
 					.catch(() => {})
 			},
-			indexImgBefore(file) {
-				this.getQiniuToken();
-			},
-			galleryBefore(file) {
-				this.picData.key = new Date().getTime() + Math.floor(Math.random() * 100) + file.name; //自定义图片名
-				this.getQiniuToken();
-			},
+
 			galleryRemove(file, fileList) {
 				console.log(file);
 				console.log(fileList);
@@ -529,10 +505,7 @@
 				console.log('editor blur!', editor)
 			},
 
-			beforeUpload(file) {
-				this.getQiniuToken();
-				this.quillUpdateImg = true
-			},
+
 			uploadError() {
 				// loading动画消失
 				this.quillUpdateImg = false
@@ -636,15 +609,14 @@
 				lrz(file).then((rst) => {
 					const config = {
 						headers: {
-							'Content-Type': 'multipart/form-data'
+							'Content-Type': 'multipart/form-data',
+							'X-Hiolabs-Token': localStorage.getItem('token') || ''
 						},
 					};
-					const fileName = moment().format('YYYYMMDDHHmmssSSS') + Math.floor(Math.random() * 100) + file.name; //自定义图片名
 					const formData = new FormData();
 					formData.append('file', rst.file);
-					formData.append('token', this.picData.token);
-					formData.append('key', fileName);
-					this.$http.post(this.qiniuZone, formData, config).then((res) => {
+					formData.append('type', 'detail');
+					this.$http.post(this.uploadUrl, formData, config).then((res) => {
 						this.handleUploadDetailSuccess(res.data)
 					})
 				}).catch(function(err) {
@@ -652,17 +624,14 @@
 				})
 			},
 			handleUploadDetailSuccess(res) {
-				let url = this.url;
-				let data = url + res.key;
 				let quill = this.$refs.myTextEditor.quill
 				// 如果上传成功
 				// 获取光标所在位置
 				let length = quill.getSelection().index;
-				// 插入图片  res.info为服务器返回的图片地址
-				quill.insertEmbed(length, 'image', data)
+				// 插入图片  res.fileUrl为服务器返回的图片地址
+				quill.insertEmbed(length, 'image', res.fileUrl)
 				// 调整光标到最后
 				quill.setSelection(length + 1)
-				// this.$message.error('图片插入失败')
 				// loading动画消失
 				this.quillUpdateImg = false
 			},
@@ -756,14 +725,12 @@
 			this.getInfo();
 			this.getAllCategory();
 			this.getExpressData();
-			this.getQiniuToken();
 			this.getAllSpecification();
 			if (this.infoForm.id > 0) {
 				this.getSpecData();
 				this.getGalleryList();
 			}
 			this.root = api.rootUrl;
-			this.qiniuZone = api.qiniu;
 		},
 	}
 </script>

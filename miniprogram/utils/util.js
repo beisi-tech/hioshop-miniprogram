@@ -363,6 +363,21 @@ function getUid(prefix) {
     );
 }
 
+/**
+ * 获取图片完整URL
+ * 如果是完整URL（以http开头）则直接返回
+ * 如果是相对路径则拼接ApiRoot
+ * @param {string} url 图片URL或相对路径
+ * @returns {string} 完整的图片URL
+ */
+function getImageUrl(url) {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+    }
+    return api.ApiRoot + url;
+}
+
 
 module.exports = {
     formatTime: formatTime,
@@ -382,5 +397,6 @@ module.exports = {
     transferColor,
     transferPadding,
     transferBoxShadow,
-    getUid
+    getUid,
+    getImageUrl
 }
